@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int linelength=1024;
 FILE* input;
@@ -8,6 +9,7 @@ FILE* output;
 void readfromstdin();
 void printhelp();
 void readfromfile(char* filename);
+void compress();
 
 int main(int argc, char * argv[])
 {
@@ -24,6 +26,7 @@ int main(int argc, char * argv[])
                 printf("test %i",i);
                 printf("test %s",argv[i]);
                 readfromfile(argv[i]);
+                compress();
             }
             
         }
@@ -33,6 +36,7 @@ int main(int argc, char * argv[])
     //If no argument is given read from stdin
     if(argc==1){
         readfromstdin();
+        compress();
         }
     
     
@@ -41,10 +45,15 @@ int main(int argc, char * argv[])
 }
 
 void readfromfile(char* filename){
-    printf("filename %s",filename);
-    char* filenamecomp=strcat(filename,".comp");
+    
+    char filenamecomp[100]=""; //100 chars max. filename size incl. .comp
+    strcpy(filenamecomp,filename);
+    strcat(filenamecomp,".comp");
     input=fopen(filename,"r");
     output=fopen(filenamecomp,"w");
+    
+    printf("filename %s",filename);
+    printf("filenamecomp %s",filenamecomp);
 }
 
 void readfromstdin(){
@@ -58,3 +67,40 @@ void printhelp(){
     printf("\n\n usage: mycompress [filename1] [filename2] ...\n");
     
 }
+
+void compress(){
+    
+    if(input != NULL && output != NULL){
+        
+        char activechar;
+        char priorchar;
+        
+        int totalcharcounter=0;
+        int samecharcounter=1;
+        
+        while((activechar=fgetc(input)) != EOF ) {
+            printf("\nchar %c",activechar);
+            if(totalcharcounter>0){
+                printf("activechar:%c priorchar:%c",activechar,priorchar);
+                
+                if(activechar==priorchar){samecharcounter++;}else{
+                    printf("\n!!!!activechar:%c samecharcounter:%i",activechar,samecharcounter);
+                    fprintf(output,"%c%i",priorchar,samecharcounter);
+                    
+                    priorchar=activechar;
+                    samecharcounter=1;
+                }
+                
+                
+            
+            }else{priorchar=activechar;}
+            totalcharcounter++;
+        }
+        
+        
+        
+    }
+}
+
+
+
