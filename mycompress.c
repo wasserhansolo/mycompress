@@ -6,9 +6,24 @@ int linelength=1024;
 FILE* input;
 FILE* output;
 
+/**
+ * @brief sets the input and output according to read from stdin and write to Stdin.comp
+ */
 void readfromstdin();
+
+/**
+ * @brief prints help message
+ */
 void printhelp();
+
+/**
+ * @brief sets the input and output according to read from a file and write to file.comp
+ */
 void readfromfile(char* filename);
+
+/**
+ * @brief compresses input and writes to output.
+ */
 void compress();
 
 int main(int argc, char * argv[])
@@ -17,16 +32,17 @@ int main(int argc, char * argv[])
     //If first argument is help -> print help
     if(argv[1]!=NULL){
         if(strcmp(argv[1],"--help")==0){
-            printhelp();}
+            printhelp();
+            return(EXIT_FAILURE);
+        }
     
         //mycompress with given input file(s) 
         if(argc>=2){
             
             for(int i=1;i<argc;i++){
-                printf("test %i",i);
-                printf("test %s",argv[i]);
                 readfromfile(argv[i]);
                 compress();
+                return EXIT_SUCCESS;
             }
             
         }
@@ -37,11 +53,12 @@ int main(int argc, char * argv[])
     if(argc==1){
         readfromstdin();
         compress();
+        return EXIT_SUCCESS;
         }
     
     
     
-    return 0;
+    return EXIT_FAILURE;
 }
 
 void readfromfile(char* filename){
@@ -52,19 +69,20 @@ void readfromfile(char* filename){
     input=fopen(filename,"r");
     output=fopen(filenamecomp,"w");
     
-    printf("filename %s",filename);
-    printf("filenamecomp %s",filenamecomp);
+   
 }
 
 void readfromstdin(){
     
     input = stdin;
     output = fopen("Stdin.comp", "w");
+    
+    printf("\nWritten to Stdin.comp\n");
 }
 
 void printhelp(){
     
-    printf("\n\n usage: mycompress [filename1] [filename2] ...\n");
+    printf("\n usage: mycompress [filename1] [filename2] ...\n");
     
 }
 
@@ -79,12 +97,9 @@ void compress(){
         int samecharcounter=1;
         
         while((activechar=fgetc(input)) != EOF ) {
-            printf("\nchar %c",activechar);
             if(totalcharcounter>0){
-                printf("activechar:%c priorchar:%c",activechar,priorchar);
                 
                 if(activechar==priorchar){samecharcounter++;}else{
-                    printf("\n!!!!activechar:%c samecharcounter:%i",activechar,samecharcounter);
                     fprintf(output,"%c%i",priorchar,samecharcounter);
                     
                     priorchar=activechar;
